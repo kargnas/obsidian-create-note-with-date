@@ -1,8 +1,72 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, TFile, TAbstractFile } from 'obsidian';
 import * as moment from 'moment';
 // Import JSON files directly
-import koTranslations from './i18n/ko.json';
-import enTranslations from './i18n/en.json';
+// Import translations
+import arCommand from './i18n/ar/command.json';
+import arNotice from './i18n/ar/notice.json';
+import enCommand from './i18n/en/command.json';
+import enNotice from './i18n/en/notice.json';
+import esCommand from './i18n/es-ES/command.json';
+import esNotice from './i18n/es-ES/notice.json';
+import jaCommand from './i18n/ja/command.json';
+import jaNotice from './i18n/ja/notice.json';
+import koCommand from './i18n/ko/command.json';
+import koNotice from './i18n/ko/notice.json';
+import zhCNCommand from './i18n/zh-CN/command.json';
+import zhCNNotice from './i18n/zh-CN/notice.json';
+import zhTWCommand from './i18n/zh-TW/command.json';
+import zhTWNotice from './i18n/zh-TW/notice.json';
+
+type TranslationData = {
+	COMMANDS: typeof enCommand;
+	NOTICES: typeof enNotice;
+};
+
+type TranslationsMap = {
+	[key: string]: TranslationData;
+};
+
+// Language code mapping
+const LANG_CODE_MAP: { [key: string]: string } = {
+	'ar': 'ar',
+	'en': 'en',
+	'es-ES': 'es',
+	'ja': 'ja',
+	'ko': 'ko',
+	'zh-CN': 'zh',
+	'zh-TW': 'zh-TW'
+};
+
+const translations: TranslationsMap = {
+	ar: {
+		COMMANDS: arCommand,
+		NOTICES: arNotice
+	},
+	en: {
+		COMMANDS: enCommand,
+		NOTICES: enNotice
+	},
+	es: {
+		COMMANDS: esCommand,
+		NOTICES: esNotice
+	},
+	ja: {
+		COMMANDS: jaCommand,
+		NOTICES: jaNotice
+	},
+	ko: {
+		COMMANDS: koCommand,
+		NOTICES: koNotice
+	},
+	zh: {
+		COMMANDS: zhCNCommand,
+		NOTICES: zhCNNotice
+	},
+	'zh-TW': {
+		COMMANDS: zhTWCommand,
+		NOTICES: zhTWNotice
+	}
+};
 
 interface Translations {
 	COMMANDS: {
@@ -19,11 +83,12 @@ interface Translations {
 export default class KarsPlugin extends Plugin {
 	getText(key: string, vars: Record<string, string> = {}): string {
 		// Get language setting from localStorage
-		const language = window.localStorage.getItem('language') || 'en';
-		const translations = language === 'ko' ? koTranslations : enTranslations;
+		const rawLanguage = window.localStorage.getItem('language') || 'en';
+		const language = LANG_CODE_MAP[rawLanguage] || rawLanguage;
+		const currentTranslations = translations[language] || translations.en;
 		
 		const keys = key.split('.');
-		let value: any = translations;
+		let value: any = currentTranslations;
 		for (const k of keys) {
 			if (!value || !value[k]) return key;
 			value = value[k];

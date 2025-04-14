@@ -1,0 +1,6 @@
+{
+  "FILE_EXISTS": "檔案 {filename} 已經存在。",
+  "FILE_CREATED": "檔案 {filename} 已建立。",
+  "FOLDER_NOT_FOUND": "找不到目前檔案的資料夾。",
+  "ERROR_CREATING_FILE": "建立檔案時發生錯誤：{error}"
+}

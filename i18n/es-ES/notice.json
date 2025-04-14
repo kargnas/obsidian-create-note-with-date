@@ -1,0 +1,6 @@
+{
+  "FILE_EXISTS": "El archivo {filename} ya existe.",
+  "FILE_CREATED": "El archivo {filename} ha sido creado.",
+  "FOLDER_NOT_FOUND": "No se pudo encontrar la carpeta del archivo actual.",
+  "ERROR_CREATING_FILE": "Error al crear el archivo: {error}"
+}

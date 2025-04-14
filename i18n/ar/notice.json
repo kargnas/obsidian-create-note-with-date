@@ -1,0 +1,6 @@
+{
+  "FILE_EXISTS": "الملف {filename} موجود بالفعل.",
+  "FILE_CREATED": "تم إنشاء الملف {filename}.",
+  "FOLDER_NOT_FOUND": "تعذر العثور على مجلد الملف الحالي.",
+  "ERROR_CREATING_FILE": "خطأ في إنشاء الملف: {error}"
+}

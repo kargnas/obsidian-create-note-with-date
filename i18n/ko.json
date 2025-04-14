@@ -1,9 +1,0 @@
-{
-	"COMMANDS": { "CREATE_TODAY_NOTE": "새 노트 생성 (오늘 날짜)" },
-	"NOTICES": {
-		"FILE_EXISTS": "{filename} 파일이 이미 존재합니다.",
-		"FILE_CREATED": "{filename} 파일이 생성되었습니다.",
-		"FOLDER_NOT_FOUND": "현재 파일의 폴더를 찾을 수 없습니다.",
-		"ERROR_CREATING_FILE": "파일 생성 중 오류가 발생했습니다: {error}"
-	}
-}
