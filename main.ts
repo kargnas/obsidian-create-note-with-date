@@ -21,7 +21,6 @@ export default class KarsPlugin extends Plugin {
 		// Get language setting from localStorage
 		const language = window.localStorage.getItem('language') || 'en';
 		const translations = language === 'ko' ? koTranslations : enTranslations;
-		console.log(language);
 		
 		const keys = key.split('.');
 		let value: any = translations;
