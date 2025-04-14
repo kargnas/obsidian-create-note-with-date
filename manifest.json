@@ -1,5 +1,5 @@
 {
-	"id": "create-note-with-date-in-this-directory",
+	"id": "create-note-with-date",
 	"name": "Create Note with Date in This Directory",
 	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
