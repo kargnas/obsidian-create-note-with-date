@@ -1,0 +1,9 @@
+{
+	"COMMANDS": { "CREATE_TODAY_NOTE": "Create New Note (Today's Date)" },
+	"NOTICES": {
+		"FILE_EXISTS": "File {filename} already exists.",
+		"FILE_CREATED": "File {filename} has been created.",
+		"FOLDER_NOT_FOUND": "Could not find the current file's folder.",
+		"ERROR_CREATING_FILE": "Error creating file: {error}"
+	}
+}
