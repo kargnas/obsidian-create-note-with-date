@@ -153,12 +153,12 @@ const createGitCommitAndTag = (version) => {
     }
     
     // Create commit
-    const commitMessage = `chore: release v${version}`;
+    const commitMessage = `chore: release ${version}`;
     execSync(`git commit -m "${commitMessage}"`, { stdio: 'inherit' });
     console.log(`✅ Commit created: ${commitMessage}`);
     
     // Create tag
-    const tagName = `v${version}`;
+    const tagName = `${version}`;
     execSync(`git tag -a ${tagName} -m "Release ${tagName}"`, { stdio: 'inherit' });
     console.log(`🏷️ Tag created: ${tagName}`);
     
@@ -271,7 +271,7 @@ const main = () => {
     
     // Check overall success
     if (success) {
-      console.log(`\n🎉 Release v${newVersion} completed successfully!`);
+      console.log(`\n🎉 Release ${newVersion} completed successfully!`);
     } else {
       console.error('❌ Release process failed. Rolling back version changes...');
       rollbackVersions();
