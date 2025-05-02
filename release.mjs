@@ -180,8 +180,39 @@ const createGitCommitAndTag = (version) => {
         return;
       }
       
+      // Get previous tag for changelog link
+      let previousTag = '';
+      try {
+        // Get all tags sorted by version (newest first)
+        const tagsOutput = execSync('git tag --sort=-v:refname', { encoding: 'utf-8' });
+        // Split by line and remove empty lines
+        const tags = tagsOutput.split('\n').filter(tag => tag.trim() !== '');
+        
+        // If current tag is in the list, get the next one (which is the previous release)
+        const currentTagIndex = tags.indexOf(tagName);
+        if (currentTagIndex >= 0 && currentTagIndex < tags.length - 1) {
+          previousTag = tags[currentTagIndex + 1];
+        } else if (tags.length > 1 && currentTagIndex < 0) {
+          // If new tag is not yet in the list, take the first one
+          previousTag = tags[0];
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not determine previous tag:', error.message);
+      }
+      
+      // Create release notes with changelog link if previous tag exists
+      let releaseNotes = `Release ${tagName}`;
+      if (previousTag) {
+        const repoUrl = execSync('git config --get remote.origin.url', { encoding: 'utf-8' })
+          .trim()
+          .replace(/\.git$/, '')
+          .replace(/^git@github\.com:/, 'https://github.com/');
+          
+        releaseNotes += `\n\n**Full Changelog**: ${repoUrl}/compare/${previousTag}...${tagName}`;
+      }
+      
       // Create GitHub Release using GitHub CLI
-      const releaseCommand = `gh release create ${tagName} ${RELEASE_FILES.join(' ')} --title "Release ${tagName}" --notes "Release ${tagName}"`;
+      const releaseCommand = `gh release create ${tagName} ${RELEASE_FILES.join(' ')} --title "Release ${tagName}" --notes "${releaseNotes}"`;
       execSync(releaseCommand, { stdio: 'inherit' });
       console.log(`✅ GitHub Release created: ${tagName}`);
     } catch (releaseError) {
