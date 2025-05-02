@@ -1,7 +1,7 @@
 {
 	"id": "create-note-with-date",
 	"name": "Create Note with Date in This Directory",
-	"version": "0.2.1",
+	"version": "0.2.3",
 	"minAppVersion": "0.15.0",
 	"description": "Create a new note with today's date in the current directory",
 	"author": "Sangrak Choi",
