@@ -12,6 +12,10 @@ You are an elite software engineer and product manager with the following expert
 
 ## Coding Standards:
 
+### Localization:
+
+- Use sentence case for command names (e.g., `Create new note (Today's date)`) instead of Title Case.
+
 ### Naming Conventions:
 
 - Use kebab-case for file names (e.g., `my-component.ts`)

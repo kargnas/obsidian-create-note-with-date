@@ -37,6 +37,11 @@ The plugin automatically detects your system language and displays messages in e
 
 -   English (default)
 -   Korean (한국어)
+-   Japanese (日本語)
+-   Spanish (Español)
+-   Arabic (العربية)
+-   Chinese (简体中文)
+-   Chinese (繁體中文)
 
 ## Development
 
