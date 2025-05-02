@@ -201,7 +201,7 @@ const createGitCommitAndTag = (version) => {
       }
       
       // Create release notes with changelog link if previous tag exists
-      let releaseNotes = `Release ${tagName}`;
+      let releaseNotes = `${tagName}`;
       if (previousTag) {
         const repoUrl = execSync('git config --get remote.origin.url', { encoding: 'utf-8' })
           .trim()
