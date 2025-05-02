@@ -49,6 +49,28 @@ The plugin automatically detects your system language and displays messages in e
 2. Run `npm install`
 3. Run `npm run dev` to start compilation in watch mode
 
+## Release Process
+
+This project includes an automated release script that makes it easy to version and publish updates:
+
+```bash
+# Update patch version (e.g., 0.2.2 → 0.2.3)
+npm run release
+
+# Update minor version (e.g., 0.2.2 → 0.3.0)
+npm run release:minor
+
+# Update major version (e.g., 0.2.2 → 1.0.0)
+npm run release:major
+```
+
+The release script automatically:
+- Updates version numbers in package.json and manifest.json
+- Builds the project
+- Creates a Git commit with the version change
+- Adds a version tag
+- Pushes the compiled files (main.js, manifest.json, styles.css) to GitHub
+
 ## License
 
 MIT
