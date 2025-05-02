@@ -23,6 +23,10 @@ const VERSION_TYPES = {
 const DEFAULT_VERSION_TYPE = VERSION_TYPES.PATCH;
 const RELEASE_FILES = ['main.js', 'manifest.json', 'styles.css'];
 
+// Store original versions for rollback if needed
+let originalPackageVersion = '';
+let originalManifestVersion = '';
+
 /**
  * Updates version value from the version string.
  * @param {string} version - Current version (e.g., '0.2.2')
@@ -53,6 +57,7 @@ const updatePackageVersion = (versionType) => {
   const packageData = JSON.parse(readFileSync(packagePath, 'utf8'));
   
   const currentVersion = packageData.version;
+  originalPackageVersion = currentVersion; // Store original version for possible rollback
   const newVersion = updateVersion(currentVersion, versionType);
   
   packageData.version = newVersion;
@@ -71,6 +76,7 @@ const updateManifestVersion = (newVersion) => {
   const manifestData = JSON.parse(readFileSync(manifestPath, 'utf8'));
   
   const currentVersion = manifestData.version;
+  originalManifestVersion = currentVersion; // Store original version for possible rollback
   manifestData.version = newVersion;
   
   writeFileSync(manifestPath, JSON.stringify(manifestData, null, '\t') + '\n');
@@ -81,9 +87,48 @@ const updateManifestVersion = (newVersion) => {
  * Run project build
  */
 const buildProject = () => {
-  console.log('🔨 Starting project build...');
-  execSync('npm run build', { stdio: 'inherit' });
-  console.log('✅ Build completed');
+  try {
+    console.log('🔨 Starting project build...');
+    execSync('npm run build', { stdio: 'inherit' });
+    console.log('✅ Build completed');
+    return true;
+  } catch (error) {
+    console.error('❌ Build failed:', error.message);
+    return false;
+  }
+};
+
+/**
+ * Rollback version changes if the release process fails
+ */
+const rollbackVersions = () => {
+  if (originalPackageVersion) {
+    try {
+      const packagePath = path.resolve(process.cwd(), 'package.json');
+      const packageData = JSON.parse(readFileSync(packagePath, 'utf8'));
+      const currentVersion = packageData.version;
+      
+      packageData.version = originalPackageVersion;
+      writeFileSync(packagePath, JSON.stringify(packageData, null, '\t') + '\n');
+      console.log(`♻️ Rolled back package.json version: ${currentVersion} → ${originalPackageVersion}`);
+    } catch (error) {
+      console.error('❌ Failed to rollback package.json version:', error.message);
+    }
+  }
+  
+  if (originalManifestVersion) {
+    try {
+      const manifestPath = path.resolve(process.cwd(), 'manifest.json');
+      const manifestData = JSON.parse(readFileSync(manifestPath, 'utf8'));
+      const currentVersion = manifestData.version;
+      
+      manifestData.version = originalManifestVersion;
+      writeFileSync(manifestPath, JSON.stringify(manifestData, null, '\t') + '\n');
+      console.log(`♻️ Rolled back manifest.json version: ${currentVersion} → ${originalManifestVersion}`);
+    } catch (error) {
+      console.error('❌ Failed to rollback manifest.json version:', error.message);
+    }
+  }
 };
 
 /**
@@ -93,8 +138,19 @@ const buildProject = () => {
 const createGitCommitAndTag = (version) => {
   try {
     // Stage changed files
-    execSync('git add package.json manifest.json', { stdio: 'inherit' });
-    execSync(`git add ${RELEASE_FILES.join(' ')}`, { stdio: 'inherit' });
+    try {
+      execSync('git add package.json manifest.json', { stdio: 'inherit' });
+    } catch (error) {
+      console.error('❌ Failed to stage package.json and manifest.json:', error.message);
+      return false;
+    }
+
+    // Try to stage release files
+    try {
+      execSync(`git add ${RELEASE_FILES.join(' ')}`, { stdio: 'inherit' });
+    } catch (error) {
+      console.warn('⚠️ Note: Some release files could not be staged. This may be normal if they are gitignored.');
+    }
     
     // Create commit
     const commitMessage = `chore: release v${version}`;
@@ -132,9 +188,10 @@ const createGitCommitAndTag = (version) => {
       console.error('⚠️ Failed to create GitHub Release:', releaseError.message);
       console.log('Release files were still committed and pushed to GitHub.');
     }
+    return true; // Successfully created commit, tag, and pushed
   } catch (error) {
     console.error('❌ Error during Git operations:', error.message);
-    process.exit(1);
+    return false; // Failed to complete Git operations
   }
 };
 
@@ -157,6 +214,9 @@ const isGitWorkingTreeClean = () => {
  * Main function
  */
 const main = () => {
+  let success = true;
+  let newVersion = '';
+  
   try {
     // Check for uncommitted changes
     if (!isGitWorkingTreeClean()) {
@@ -175,15 +235,51 @@ const main = () => {
       process.exit(1);
     }
     
-    // Execute version update and deployment process
-    const newVersion = updatePackageVersion(versionType);
-    updateManifestVersion(newVersion);
-    buildProject();
-    createGitCommitAndTag(newVersion);
+    // Step 1: Update package.json version
+    try {
+      newVersion = updatePackageVersion(versionType);
+    } catch (error) {
+      console.error('❌ Failed to update package.json version:', error.message);
+      success = false;
+    }
     
-    console.log(`\n🎉 Release v${newVersion} completed successfully!`);
+    // Step 2: Update manifest.json version
+    if (success) {
+      try {
+        updateManifestVersion(newVersion);
+      } catch (error) {
+        console.error('❌ Failed to update manifest.json version:', error.message);
+        success = false;
+      }
+    }
+    
+    // Step 3: Build the project
+    if (success) {
+      if (!buildProject()) {
+        console.error('❌ Build process failed.');
+        success = false;
+      }
+    }
+    
+    // Step 4: Git operations
+    if (success) {
+      if (!createGitCommitAndTag(newVersion)) {
+        console.error('❌ Git operations failed.');
+        success = false;
+      }
+    }
+    
+    // Check overall success
+    if (success) {
+      console.log(`\n🎉 Release v${newVersion} completed successfully!`);
+    } else {
+      console.error('❌ Release process failed. Rolling back version changes...');
+      rollbackVersions();
+      process.exit(1);
+    }
   } catch (error) {
-    console.error('❌ Error during release process:', error.message);
+    console.error('❌ Unexpected error during release process:', error.message);
+    rollbackVersions();
     process.exit(1);
   }
 };
