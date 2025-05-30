@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-create-note-with-date",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"description": "Create a new note with today's date in the current directory",
 	"main": "main.js",
 	"scripts": {
