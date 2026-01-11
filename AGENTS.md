@@ -107,6 +107,11 @@ You are an AI coding agent helping with Obsidian plugin development. You have ac
 - Creates git commit and tags version
 - Pushes compiled files (main.js, manifest.json, styles.css) to GitHub
 - Version bump script: `version-bump.mjs`
+- **GitHub Actions Auto-Release**: 
+  - Automatically triggered 10 minutes after a push to the `main` branch.
+  - If a new push occurs within the 10-minute window, the previous release task is cancelled.
+  - Can be manually triggered via GitHub Actions `workflow_dispatch`.
+  - Skips execution if the commit message already contains `chore: release`.
 
 ### Tech Stack
 - **Runtime**: Node.js

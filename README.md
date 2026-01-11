@@ -122,6 +122,14 @@ The release script automatically:
 - Adds a version tag
 - Pushes compiled files to GitHub releases
 
+### 🤖 Automated Release (GitHub Actions)
+
+A GitHub Action is configured to automate this process:
+- **Trigger**: Any push to the `main` branch
+- **Delay**: 10 minutes (to allow for quick fixes or additional commits)
+- **Cancellation**: If a new push occurs during the 10-minute wait, the previous release job is cancelled and a new one starts
+- **Manual Trigger**: Can be executed manually via the "Actions" tab in GitHub
+
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how to contribute:
