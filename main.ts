@@ -1,5 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, TFile, TAbstractFile } from 'obsidian';
-import * as moment from 'moment';
+import { Notice, Plugin, TFile } from 'obsidian';
 // Import JSON files directly
 // Import translations
 import arCommand from './i18n/ar/command.json';
@@ -68,17 +67,7 @@ const translations: TranslationsMap = {
 	}
 };
 
-interface Translations {
-	COMMANDS: {
-		CREATE_TODAY_NOTE: string;
-	};
-	NOTICES: {
-		FILE_EXISTS: string;
-		FILE_CREATED: string;
-		FOLDER_NOT_FOUND: string;
-		ERROR_CREATING_FILE: string;
-	};
-}
+
 
 export default class KarsPlugin extends Plugin {
 	getText(key: string, vars: Record<string, string> = {}): string {
@@ -86,12 +75,12 @@ export default class KarsPlugin extends Plugin {
 		const rawLanguage = window.localStorage.getItem('language') || 'en';
 		const language = LANG_CODE_MAP[rawLanguage] || rawLanguage;
 		const currentTranslations = translations[language] || translations.en;
-		
+
 		const keys = key.split('.');
-		let value: any = currentTranslations;
+		let value: unknown = currentTranslations;
 		for (const k of keys) {
-			if (!value || !value[k]) return key;
-			value = value[k];
+			if (!value || typeof value !== 'object' || !(k in value)) return key;
+			value = (value as Record<string, unknown>)[k];
 		}
 
 		if (typeof value !== 'string') return key;
